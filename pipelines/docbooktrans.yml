@@ -80,6 +80,8 @@ jobs:
       task: topdf
       image: fop
       file: ci/task/pdf.yml
+      vars:
+        fop_args: ((fop_args))
   - task: publish
     image: rsync
     file: ci/task/publish.yml

@@ -8,5 +8,5 @@ outputs:
 - name: dist
 
 run:
-  path: xsltproc
-  args: ((xsltproc_args))
+  path: fop
+  args: ((fop_args))
