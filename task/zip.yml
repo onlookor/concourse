@@ -1,0 +1,11 @@
+platform: linux
+
+inputs:
+- name: dist
+
+outputs:
+- name: dist
+
+run:
+  path: zipepub
+  args: ((zip_args))

@@ -1,0 +1,10 @@
+roles:
+  - name: owner
+    local:
+      users: [docbooker]
+  - name: member
+    local:
+      users: [pipeliner]
+  - name: operator
+    local:
+      users: [wgz]

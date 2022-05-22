@@ -1,0 +1,8 @@
+platform: linux
+
+inputs:
+- name: dist
+
+run:
+  path: rsync
+  args: ((rsync_args))

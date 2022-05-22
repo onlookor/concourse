@@ -1,0 +1,113 @@
+resources:
+- name: docbook_source
+  type: git
+  source: 
+    uri: ((docbook_source_uri))
+    username: mark
+    password: wgz'sG1t
+    skip_ssl_verification: true
+- name: ci
+  type: git
+  source: 
+    uri: ((docbook_ci_uri))
+    username: mark
+    password: wgz'sG1t
+    skip_ssl_verification: true
+- name: stylesheets
+  type: git
+  source: 
+    uri: ((xsl_stylesheets_uri))
+    username: mark
+    password: wgz'sG1t
+    skip_ssl_verification: true
+- name: xsltproc
+  type: registry-image
+  source:
+    repository: ((image_registry))/xsltproc
+    insecure: true
+- name: rsync
+  type: registry-image
+  source:
+    repository: ((image_registry))/rsync
+    insecure: true
+- name: fop
+  type: registry-image
+  source:
+    repository: ((image_registry))/fop
+    insecure: true
+- name: epubwrapper
+  type: registry-image
+  source:
+    repository: ((image_registry))/epubwrapper
+    insecure: true
+    
+jobs:
+- name: html
+  plan:
+  - get: docbook_source
+    trigger: true
+  - in_parallel:
+    - get: xsltproc
+    - get: rsync
+    - get: ci
+    - get: stylesheets
+  - task: tohtml
+    image: xsltproc
+    file: ci/task/xsltproc.yml
+    vars:
+      xsltproc_args_html: ((xsltproc_args))
+  - task: publish
+    image: rsync
+    file: ci/task/publish.yml
+    vars:
+      rsync_args_html: ((rsync_args))
+- name: pdf
+  plan:
+  - get: docbook_source
+    trigger: true
+  - in_parallel:
+    - get: xsltproc
+    - get: rsync
+    - get: ci
+    - get: stylesheets
+    - get: fop
+  - task: tofo
+    image: xsltproc
+    file: ci/task/xsltproc.yml
+    vars:
+      xsltproc_args_fo: ((xsltproc_args))
+    on_success:
+      task: topdf
+      image: fop
+      file: ci/task/pdf.yml
+  - task: publish
+    image: rsync
+    file: ci/task/publish.yml
+    vars:
+      rsync_args_pdf: ((rsync_args))
+- name: epub
+  plan:
+  - get: docbook_source
+    trigger: true
+  - in_parallel:
+    - get: xsltproc
+    - get: rsync
+    - get: ci
+    - get: stylesheets
+    - get: epubwrapper
+  - task: toepub
+    image: xsltproc
+    file: ci/task/xsltproc.yml
+    vars:
+      xsltproc_args_epub: ((xsltproc_args))
+    on_success:
+      task: zip
+      image: epubwrapper
+      file: ci/task/zip.yml
+      vars:
+        zip_args: ((zip_args))
+  - task: publish
+    image: rsync
+    file: ci/task/publish.yml
+    vars:
+      rsync_args_epub: ((rsync_args))

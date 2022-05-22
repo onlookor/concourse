@@ -1,0 +1,12 @@
+platform: linux
+
+inputs:
+- name: docbook_source
+- name: stylesheets
+
+outputs:
+- name: dist/epub
+
+run:
+  path: xsltproc
+  args: ((xsltproc_args_epub))
