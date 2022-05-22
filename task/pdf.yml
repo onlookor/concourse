@@ -1,8 +1,7 @@
 platform: linux
 
 inputs:
-- name: docbook_source
-- name: stylesheets
+- name: dist
 
 outputs:
 - name: dist
